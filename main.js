@@ -1,6 +1,5 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu } = require('electron')
-const path = require('path')
 
 let mainWindow;
 
@@ -10,13 +9,11 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     }
   });
 
   mainWindow.loadFile('index.html');
-  mainWindow.webContents.send('show');
 
   mainWindow.on('close', () => {
     mainWindow.webContents.send('app-closing');

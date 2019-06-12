@@ -9,15 +9,15 @@ const { ipcRenderer } = require('electron');
 const chooseFTS = document.getElementById('choose-folder-to-sort');
 var chooseKey = document.getElementById('key-1');
 
+let keyWin = null;
+
+
 chooseKey.addEventListener('click', (e) => {
     if (keyWin === null) {
         createKeyWindow();
         chooseKey.disabled = true;
     }
 })
-
-let keyWin = null;
-
 
 function createKeyWindow() {
     keyWin = new BrowserWindow({
@@ -52,11 +52,6 @@ chooseFTS.addEventListener('click', (e) => {
 ipcRenderer.on("app-closing", () => {
     saveAppState();
 })
-
-ipcRenderer.on("show", () => {
-
-})
-
 
 function saveAppState() {
     var t = fs.readFileSync(__dirname + "/appSavedState.json");
