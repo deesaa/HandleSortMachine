@@ -1,7 +1,15 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
+
+const fs = require('fs');
+
 window.addEventListener('DOMContentLoaded', () => {
-  for (const versionType of ['chrome', 'electron', 'node']) {
-    document.getElementById(`${versionType}-version`).innerText = process.versions[versionType]
-  }
+    loadSavedState();
 })
+
+function loadSavedState() {
+    var t = fs.readFileSync(__dirname + "/appSavedState.json");
+    var savedState = JSON.parse(t);
+
+    document.getElementById("folder-to-sort").value = savedState.folderToSort;
+}

@@ -4,8 +4,40 @@
 
 const { BrowserWindow } = require('electron').remote;
 const { dialog } = require('electron').remote;
+const { ipcRenderer } = require('electron');
+
+const fs = require('fs');
 
 const chooseFTS = document.getElementById('choose-folder-to-sort');
+const chooseKey = document.getElementById('key-1');
+
+let keyWin = null;
+
+
+chooseKey.addEventListener('click', (e) => {
+    if (keyWin === null) {
+        createKeyWindow();
+        chooseKey.disabled = true;
+    }
+})
+
+function createKeyWindow() {
+    keyWin = new BrowserWindow({
+        webPreferences: {
+            nodeIntegration: true
+        },
+        parent: BrowserWindow,
+        width: 150,
+        height: 150
+    });
+
+    keyWin.loadFile('listenKey.html');
+
+    keyWin.on('close', () => {
+        chooseKey.disabled = false;
+        keyWin = null;
+    })
+}
 
 chooseFTS.addEventListener('click', (e) => {
     let folderPath = dialog.showOpenDialog({
@@ -18,3 +50,19 @@ chooseFTS.addEventListener('click', (e) => {
         console.log('Denied');
     }
 });
+
+ipcRenderer.on("app-closing", () => {
+    saveAppState();
+})
+
+
+function saveAppState() {
+    var t = fs.readFileSync(__dirname + "/appSavedState.json");
+    var savedState = JSON.parse(t);
+
+    savedState.folderToSort = document.getElementById('folder-to-sort').value;
+
+
+
+    fs.writeFileSync(__dirname + "/appSavedState.json", JSON.stringify(savedState));
+}
