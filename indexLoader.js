@@ -3,9 +3,6 @@ const fs = require('fs');
 
 loadSavedState();
 
-
-
-
 function loadSavedState() {
     var t = fs.readFileSync(__dirname + "/appSavedState.json");
     var savedState = JSON.parse(t);
@@ -27,6 +24,9 @@ function createFolderLineElement(number, savedState) {
     i1.name = "sort-to-folder-" + number;
     i1.id = "sort-to-folder-" + number;
     i1.value = savedState.sortToFolders.folders[number - 1].path;
+    var i4 = document.createElement("input");
+    i4.type = "button";
+    i4.value = "Delete";
     var i2 = document.createElement("input");
     i2.type = "button";
     i2.value = "Choose Folder";
@@ -39,6 +39,7 @@ function createFolderLineElement(number, savedState) {
     var div = document.createElement("div");
     div.className = "folder-line";
     div.appendChild(i1);
+    div.appendChild(i4);
     div.appendChild(i2);
     div.appendChild(i3);
 
