@@ -16,6 +16,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+  mainWindow.webContents.send('show');
 
   mainWindow.on('close', () => {
     mainWindow.webContents.send('app-closing');
@@ -28,6 +29,7 @@ function createWindow() {
 
   const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   Menu.setApplicationMenu(mainMenu);
+
 }
 
 app.on('ready', createWindow);

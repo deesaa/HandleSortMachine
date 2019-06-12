@@ -6,13 +6,8 @@ const { BrowserWindow } = require('electron').remote;
 const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron');
 
-const fs = require('fs');
-
 const chooseFTS = document.getElementById('choose-folder-to-sort');
-const chooseKey = document.getElementById('key-1');
-
-let keyWin = null;
-
+var chooseKey = document.getElementById('key-1');
 
 chooseKey.addEventListener('click', (e) => {
     if (keyWin === null) {
@@ -20,6 +15,9 @@ chooseKey.addEventListener('click', (e) => {
         chooseKey.disabled = true;
     }
 })
+
+let keyWin = null;
+
 
 function createKeyWindow() {
     keyWin = new BrowserWindow({
@@ -53,6 +51,10 @@ chooseFTS.addEventListener('click', (e) => {
 
 ipcRenderer.on("app-closing", () => {
     saveAppState();
+})
+
+ipcRenderer.on("show", () => {
+
 })
 
 
