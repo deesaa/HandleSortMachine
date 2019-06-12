@@ -1,0 +1,16 @@
+{
+    "folderToSort": "",
+    "sortToFolders": {
+        "count": 2,
+        "folders": [
+            {
+                "path": "",
+                "key": "Left"
+            },
+            {
+                "path": "",
+                "key": "Right"
+            }
+        ]
+    }
+}

@@ -1,0 +1,7 @@
+input[id = "folder-to-sort"]{
+    width: 100%;
+}
+
+input[id ^= "sort-to-folder"]{
+    width: 100%;
+}
