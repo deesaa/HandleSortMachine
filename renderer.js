@@ -14,6 +14,8 @@ let keyWin = null;
 let saveButton = document.getElementById('save-button');
 let addFolderButton = document.getElementById('add-sort-to-folder');
 
+setEventListners();
+
 
 chooseKey.addEventListener('click', (e) => {
     if (keyWin === null) {
@@ -67,33 +69,11 @@ ipcRenderer.on("app-closing", () => {
 function addSortFolder() {
     var list = document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].getElementsByTagName('li');
     var folderIndex = list.length + 1;
+    var path = "new";
+    var key = "new";
 
-    var i1 = document.createElement("input");
-    i1.type = "text";
-    i1.name = "sort-to-folder-" + folderIndex;
-    i1.id = "sort-to-folder-" + folderIndex;
-    i1.value = "new";
-    var i4 = document.createElement("input");
-    i4.type = "button";
-    i4.value = "Delete";
-    var i2 = document.createElement("input");
-    i2.type = "button";
-    i2.value = "Choose Folder";
-    var i3 = document.createElement("input");
-    i3.type = "text";
-    i3.name = "key-" + folderIndex;
-    i3.id = "key-" + folderIndex;
-    i3.value = "new";
+    var li = ec.createFolderLineListElement(folderIndex, path, key);
 
-    var div = document.createElement("div");
-    div.className = "folder-line";
-    div.appendChild(i1);
-    div.appendChild(i4);
-    div.appendChild(i2);
-    div.appendChild(i3);
-
-    var li = document.createElement("li");
-    li.appendChild(div);
     document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].appendChild(li);
 }
 
@@ -116,4 +96,40 @@ function saveAppState() {
     }
 
     fs.writeFileSync(__dirname + "/appSavedState.json", JSON.stringify(savedState));
+}
+
+
+function setEventListners() {
+    var lis = document.getElementsByTagName("li");
+    var count = lis.length;
+
+    for (var index = 1; index <= count; index++) {
+        var stf = document.getElementById("choose-folder-" + index);
+        function chooseFolder() {
+            var elIndex = index;
+            return function () {
+                let folderPath = dialog.showOpenDialog({
+                    properties: ['openDirectory']
+                });
+
+                if (folderPath !== undefined) {
+                    document.getElementById("sort-to-folder-" + elIndex).value = folderPath;
+                } else {
+                    console.log('Denied');
+                }
+            }
+        }
+        stf.addEventListener('click', chooseFolder());
+
+
+        var df = document.getElementById("delete-" + index);
+        function deleteFolder() {
+            var elIndex = index;
+            return function () {
+                console.log("deleting folder " + elIndex);
+            }
+        }
+        df.addEventListener('click', deleteFolder());
+
+    }
 }

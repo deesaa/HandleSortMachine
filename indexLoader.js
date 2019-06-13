@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const ec = require("./elementCreator.js");
 
 loadSavedState();
 
@@ -12,39 +13,12 @@ function loadSavedState() {
     var list = document.getElementById("sort-to-folder").getElementsByTagName('ul')[0];
 
     var count = savedState.sortToFolders.count;
-    for (var i = 1; i <= count; i++) {
-        var folderLine = createFolderLineElement(i, savedState);
+    for (var index = 1; index <= count; index++) {
+
+        var path = savedState.sortToFolders.folders[index - 1].path;
+        var key = savedState.sortToFolders.folders[index - 1].key;
+
+        var folderLine = ec.createFolderLineListElement(index, path, key);
         list.appendChild(folderLine);
     }
-}
-
-function createFolderLineElement(number, savedState) {
-    var i1 = document.createElement("input");
-    i1.type = "text";
-    i1.name = "sort-to-folder-" + number;
-    i1.id = "sort-to-folder-" + number;
-    i1.value = savedState.sortToFolders.folders[number - 1].path;
-    var i4 = document.createElement("input");
-    i4.type = "button";
-    i4.value = "Delete";
-    var i2 = document.createElement("input");
-    i2.type = "button";
-    i2.value = "Choose Folder";
-    var i3 = document.createElement("input");
-    i3.type = "text";
-    i3.name = "key-" + number;
-    i3.id = "key-" + number;
-    i3.value = savedState.sortToFolders.folders[number - 1].key;
-
-    var div = document.createElement("div");
-    div.className = "folder-line";
-    div.appendChild(i1);
-    div.appendChild(i4);
-    div.appendChild(i2);
-    div.appendChild(i3);
-
-    var li = document.createElement("li");
-    li.appendChild(div);
-
-    return li;
 }
