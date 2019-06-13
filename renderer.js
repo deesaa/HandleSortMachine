@@ -7,22 +7,14 @@ const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron');
 
 const chooseFTS = document.getElementById('choose-folder-to-sort');
-var chooseKey = document.getElementById('key-1');
 
 let keyWin = null;
+let editingKey = null;
 
 let saveButton = document.getElementById('save-button');
 let addFolderButton = document.getElementById('add-sort-to-folder');
 
-setEventListners();
-
-
-chooseKey.addEventListener('click', (e) => {
-    if (keyWin === null) {
-        createKeyWindow();
-        chooseKey.disabled = true;
-    }
-});
+setAllEventListners();
 
 saveButton.addEventListener('click', (e) => {
     saveAppState();
@@ -31,24 +23,6 @@ saveButton.addEventListener('click', (e) => {
 addFolderButton.addEventListener('click', () => {
     addSortFolder();
 });
-
-function createKeyWindow() {
-    keyWin = new BrowserWindow({
-        webPreferences: {
-            nodeIntegration: true
-        },
-        parent: BrowserWindow,
-        width: 150,
-        height: 150
-    });
-
-    keyWin.loadFile('listenKey.html');
-
-    keyWin.on('close', () => {
-        chooseKey.disabled = false;
-        keyWin = null;
-    })
-}
 
 chooseFTS.addEventListener('click', (e) => {
     let folderPath = dialog.showOpenDialog({
@@ -66,6 +40,7 @@ ipcRenderer.on("app-closing", () => {
     saveAppState();
 })
 
+
 function addSortFolder() {
     var list = document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].getElementsByTagName('li');
     var folderIndex = list.length + 1;
@@ -75,6 +50,8 @@ function addSortFolder() {
     var li = ec.createFolderLineListElement(folderIndex, path, key);
 
     document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].appendChild(li);
+
+    addEventListenersTo(folderIndex);
 }
 
 function saveAppState() {
@@ -99,37 +76,90 @@ function saveAppState() {
 }
 
 
-function setEventListners() {
+function setAllEventListners() {
     var lis = document.getElementsByTagName("li");
     var count = lis.length;
 
     for (var index = 1; index <= count; index++) {
-        var stf = document.getElementById("choose-folder-" + index);
-        function chooseFolder() {
-            var elIndex = index;
-            return function () {
-                let folderPath = dialog.showOpenDialog({
-                    properties: ['openDirectory']
-                });
-
-                if (folderPath !== undefined) {
-                    document.getElementById("sort-to-folder-" + elIndex).value = folderPath;
-                } else {
-                    console.log('Denied');
-                }
-            }
-        }
-        stf.addEventListener('click', chooseFolder());
-
-
-        var df = document.getElementById("delete-" + index);
-        function deleteFolder() {
-            var elIndex = index;
-            return function () {
-                console.log("deleting folder " + elIndex);
-            }
-        }
-        df.addEventListener('click', deleteFolder());
-
+        addEventListenersTo(index);
     }
 }
+
+function addEventListenersTo(index) {
+    var stf = document.getElementById("choose-folder-" + index);
+    function chooseFolder() {
+        var elIndex = index;
+        return function () {
+            let folderPath = dialog.showOpenDialog({
+                properties: ['openDirectory']
+            });
+
+            if (folderPath !== undefined) {
+                document.getElementById("sort-to-folder-" + elIndex).value = folderPath;
+            } else {
+                console.log('Denied');
+            }
+        }
+    }
+    stf.addEventListener('click', chooseFolder());
+
+
+    var df = document.getElementById("delete-" + index);
+    function deleteFolder() {
+        var elIndex = index;
+        return function () {
+            var listItem = document.getElementById("list-item-" + elIndex);
+            listItem.remove();
+        }
+    }
+    df.addEventListener('click', deleteFolder());
+
+    var key = document.getElementById("key-" + index);
+    function selectKey() {
+        var elIndex = index;
+        return function () {
+            console.log('selectin key for ' + elIndex);
+
+            if (keyWin === null) {
+                createKeyWindow(key);
+                editingKey = document.getElementById("key-" + elIndex);
+                key.disabled = true;
+            } else {
+                keyWin.focus();
+            }
+        }
+    }
+    key.addEventListener('click', selectKey());
+}
+
+function createKeyWindow(keyElement) {
+    keyWin = new BrowserWindow({
+        webPreferences: {
+            nodeIntegration: true
+        },
+        alwaysOnTop: true,
+        parent: BrowserWindow,
+        width: 250,
+        height: 250
+    });
+
+    keyWin.loadFile('listenKey.html');
+
+    keyWin.on('close', () => {
+        keyElement.disabled = false;
+        keyWin = null;
+        editingKey = null;
+    })
+}
+
+ipcRenderer.on('pressedkey', (e, arg) => {
+    if (editingKey !== null && arg.key != null)
+        editingKey.value = arg.key;
+})
+
+
+ipcRenderer.on('pressed:enter', () => {
+    if (keyWin !== null) {
+        keyWin.close();
+    }
+})

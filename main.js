@@ -51,6 +51,46 @@ const mainMenuTemplate = [
         }
       }
     ]
+  },
+  {
+    label: '',
+    submenu: [
+      {
+        label: '',
+        accelerator: "Left",
+        click() {
+          mainWindow.webContents.send('pressedkey', { key: 'Left' });
+        }
+      },
+      {
+        label: '',
+        accelerator: "Right",
+        click() {
+          mainWindow.webContents.send('pressedkey', { key: 'Right' });
+        }
+      },
+      {
+        label: '',
+        accelerator: "Up",
+        click() {
+          mainWindow.webContents.send('pressedkey', { key: 'Up' });
+        }
+      },
+      {
+        label: '',
+        accelerator: "Down",
+        click() {
+          mainWindow.webContents.send('pressedkey', { key: 'Down' });
+        }
+      },
+      {
+        label: '',
+        accelerator: "Enter",
+        click() {
+          mainWindow.webContents.send('pressed:enter');
+        }
+      },
+    ]
   }
 ];
 

@@ -5,6 +5,7 @@ function createFolderLineListElement(index, path, key) {
     i1.type = "text";
     i1.id = "sort-to-folder-" + index;
     i1.value = path;
+    i1.disabled = true;
     var i4 = document.createElement("input");
     i4.type = "button";
     i4.id = "delete-" + index;
@@ -27,6 +28,7 @@ function createFolderLineListElement(index, path, key) {
 
     var li = document.createElement("li");
     li.appendChild(div);
+    li.id = "list-item-" + index;
 
     return li;
 }
