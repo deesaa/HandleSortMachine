@@ -5,3 +5,15 @@ input[id = "folder-to-sort"]{
 input[id ^= "sort-to-folder"]{
     width: 100%;
 }
+
+.image-for-sort{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+    border: 3px solid black;
+}
+
+aside{
+    float: left;
+}

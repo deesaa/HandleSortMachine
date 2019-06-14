@@ -8,11 +8,14 @@ const { ipcRenderer } = require('electron');
 
 const chooseFTS = document.getElementById('choose-folder-to-sort');
 
-let keyWin = null;
+let editingKeyWin = null;
 let editingKey = null;
+
+let sortingWindow = null;
 
 let saveButton = document.getElementById('save-button');
 let addFolderButton = document.getElementById('add-sort-to-folder');
+let startSortButton = document.getElementById('start-sort-button');
 
 setAllEventListners();
 
@@ -23,6 +26,26 @@ saveButton.addEventListener('click', (e) => {
 addFolderButton.addEventListener('click', () => {
     addSortFolder();
 });
+
+startSortButton.addEventListener('click', () => {
+    if (sortingWindow === null) {
+        saveAppState();
+
+        sortingWindow = new BrowserWindow({
+            webPreferences: {
+                nodeIntegration: true
+            }
+        })
+        sortingWindow.loadFile('sortingWindow.html');
+        sortingWindow.maximize();
+
+        sortingWindow.on('close', () => {
+            sortingWindow = null;
+        })
+    } else {
+        sortingWindow.focus();
+    }
+})
 
 chooseFTS.addEventListener('click', (e) => {
     let folderPath = dialog.showOpenDialog({
@@ -120,12 +143,12 @@ function addEventListenersTo(index) {
         return function () {
             console.log('selectin key for ' + elIndex);
 
-            if (keyWin === null) {
+            if (editingKeyWin === null) {
                 createKeyWindow(key);
                 editingKey = document.getElementById("key-" + elIndex);
                 key.disabled = true;
             } else {
-                keyWin.focus();
+                editingKeyWin.focus();
             }
         }
     }
@@ -133,33 +156,40 @@ function addEventListenersTo(index) {
 }
 
 function createKeyWindow(keyElement) {
-    keyWin = new BrowserWindow({
+    editingKeyWin = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true
         },
         alwaysOnTop: true,
         parent: BrowserWindow,
         width: 250,
-        height: 250
+        height: 250,
+        autoHideMenuBar: true
     });
 
-    keyWin.loadFile('listenKey.html');
+    editingKeyWin.loadFile('listenKey.html');
 
-    keyWin.on('close', () => {
+    editingKeyWin.on('close', () => {
         keyElement.disabled = false;
-        keyWin = null;
+        editingKeyWin = null;
         editingKey = null;
     })
 }
 
 ipcRenderer.on('pressedkey', (e, arg) => {
+    //Если открыто окно сортировки, перебрасываем нажатые кнопки в него
+    if (sortingWindow !== null) {
+        sortingWindow.webContents.send('pressedkey', arg);
+        return;
+    }
+
     if (editingKey !== null && arg.key != null)
         editingKey.value = arg.key;
 })
 
 
 ipcRenderer.on('pressed:enter', () => {
-    if (keyWin !== null) {
-        keyWin.close();
+    if (editingKeyWin !== null) {
+        editingKeyWin.close();
     }
 })
