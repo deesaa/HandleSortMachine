@@ -28,6 +28,10 @@ clearHistoryBtn.addEventListener('click', () => {
     clearHistory();
 })
 
+cancelMoveBtn.addEventListener('click', () => {
+    cancelLastMove();
+})
+
 ipcRenderer.on('pressedkey', (e, arg) => {
     //Нажатиями перемещаем файлы в нужные папки
     if (currentImage) {
@@ -49,7 +53,7 @@ ipcRenderer.on('pressedkey', (e, arg) => {
             //Перемещаем текущую картинку в папку по найденному пути
             fs.renameSync(currentImage, path + "/" + targetFiles[0]);
 
-            //TODO:Запись в историю 
+            //Запись в историю 
             var fileName = targetFiles[0];
             var origin = sortingFolder;
             var destination = path;
@@ -148,7 +152,28 @@ function addToHistoryList(item) {
 
 function clearHistory() {
     var historyList = document.getElementById('history-list');
-    while (historyList.firstChild) {
-        historyList.removeChild(historyList.firstChild);
+    while (historyList.lastChild) {
+        historyList.removeChild(historyList.lastChild);
+    }
+}
+
+function cancelLastMove() {
+    var historyList = document.getElementById('history-list');
+    if (historyList.getElementsByTagName('li')[0]) {
+
+        //Перемещаем файл обратно
+        var fileName = historyList.getElementsByTagName('li')[0].getElementsByClassName('file-name')[0].innerHTML;
+        var origin = historyList.getElementsByTagName('li')[0].getElementsByClassName('origin')[0].innerHTML;
+        var destination = historyList.getElementsByTagName('li')[0].getElementsByClassName('destination')[0].innerHTML;
+        fs.renameSync(path.join(destination, fileName), path.join(origin, fileName));
+
+        //Удаляем из истории
+        historyList.firstChild.remove();
+
+        //Добавляем в текущие файлы 
+        targetFiles.unshift(fileName);
+
+        //Загружаем картинку
+        loadNextImage();
     }
 }
