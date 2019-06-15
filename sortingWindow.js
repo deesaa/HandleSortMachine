@@ -2,28 +2,96 @@ const { BrowserWindow } = require('electron').remote;
 const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const path = require('path');
 
-var folders;
+var folders = [];
+var sortingFolder;
+var targetFiles;
+var currentImage = null;
 loadSavedState();
+loadTargetFiles();
+loadNextImage();
+
 let clearHistoryBtn = document.getElementById("clear-history");
 let saveHistoryBtn = document.getElementById("save-history");
-
-ipcRenderer.on('pressedkey', () => {
-    console.log(322);
-})
-
-ipcRenderer.on('close', () => {
-    saveHistoy();
-})
+let cancelMoveBtn = document.getElementById("cancel-move");
 
 saveHistoryBtn.addEventListener('click', () => {
     saveHistoy();
 })
 
+window.addEventListener('beforeunload', () => {
+    saveHistoy();
+})
+
+clearHistoryBtn.addEventListener('click', () => {
+    clearHistory();
+})
+
+ipcRenderer.on('pressedkey', (e, arg) => {
+    //Нажатиями перемещаем файлы в нужные папки
+    if (currentImage) {
+        var key = arg.key;
+        var path;
+        //Ищем нужный путь по ключу
+        var folder = folders.find((folder, index) => {
+            return folder.key === key;
+        });
+
+        if (folder) {
+            path = folder.path;
+        } else {
+            console.log("Папка не найдена");
+        }
+
+        if (path) {
+
+            //Перемещаем текущую картинку в папку по найденному пути
+            fs.renameSync(currentImage, path + "/" + targetFiles[0]);
+
+            //TODO:Запись в историю 
+            var fileName = targetFiles[0];
+            var origin = sortingFolder;
+            var destination = path;
+            var liItem = document.createElement('li');
+            liItem.innerHTML = `<span class="file-name">${fileName}</span> moved from <span class="origin">${origin}</span> to <span class="destination">${destination}</span>`;
+            addToHistoryList(liItem);
+
+            //Убираем перемещенный файл из текущих
+            targetFiles.shift();
+            //Загружаем следующий файл
+            loadNextImage();
+        } else {
+            console.log("Путь не найден");
+        }
+    }
+})
+
+function loadTargetFiles() {
+
+    //TODO: Добавить все остальные расширения
+    var extension = '.jpg';
+    var files = fs.readdirSync(sortingFolder);
+    targetFiles = files.filter((file) => {
+        return path.extname(file).toLowerCase() === extension;
+    });
+}
+
+function loadNextImage() {
+    if (targetFiles.length != 0) {
+        currentImage = sortingFolder + "/" + targetFiles[0];
+        document.getElementById("image-for-sort").setAttribute("src", currentImage);
+    } else {
+        console.log("Нет подходящих файлов в папке");
+
+    }
+}
+
 function loadSavedState() {
     var t = fs.readFileSync(__dirname + "/appSavedState.json");
     var savedState = JSON.parse(t);
     folders = savedState.sortToFolders.folders;
+    sortingFolder = savedState.folderToSort;
 
     var li = document.getElementById('sort-window-map').getElementsByTagName('ul')[0];
     for (var i = 1; i <= savedState.sortToFolders.count; i++) {
@@ -75,5 +143,12 @@ function addToHistoryList(item) {
         historyList.insertBefore(item, historyList.firstChild)
     } else {
         historyList.appendChild(item);
+    }
+}
+
+function clearHistory() {
+    var historyList = document.getElementById('history-list');
+    while (historyList.firstChild) {
+        historyList.removeChild(historyList.firstChild);
     }
 }

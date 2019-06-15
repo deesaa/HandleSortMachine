@@ -90,8 +90,9 @@ function saveAppState() {
 
     for (i = 0; i < lis.length; i++) {
         var folder = {};
-        folder.path = document.getElementById("sort-to-folder-" + (i + 1)).value;
-        folder.key = document.getElementById("key-" + (i + 1)).value;
+        var index = lis[i].getElementsByClassName("folder-line")[0].getAttribute("index");
+        folder.path = document.getElementById("sort-to-folder-" + index).value;
+        folder.key = document.getElementById("key-" + index).value;
         savedState.sortToFolders.folders[i] = folder;
     }
 

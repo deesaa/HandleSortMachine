@@ -21,6 +21,7 @@ function createFolderLineListElement(index, path, key) {
 
     var div = document.createElement("div");
     div.className = "folder-line";
+    div.setAttribute("index", index);
     div.appendChild(i1);
     div.appendChild(i4);
     div.appendChild(i2);
