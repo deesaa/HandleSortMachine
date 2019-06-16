@@ -17,3 +17,8 @@ input[id ^= "sort-to-folder"]{
 aside{
     float: left;
 }
+
+.file-name, .origin, .destination{
+    font-size: 12px;
+    color: red;
+}

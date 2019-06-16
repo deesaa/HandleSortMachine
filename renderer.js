@@ -69,6 +69,7 @@ ipcRenderer.on("app-closing", () => {
 function addSortFolder() {
     var list = document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].getElementsByTagName('li');
     var folderIndex = list.length + 1;
+    //TODO: Новые ключи беруться из доступных
     var path = "new";
     var key = "new";
 
