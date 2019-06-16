@@ -5,6 +5,7 @@
 const { BrowserWindow } = require('electron').remote;
 const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron');
+const path = require('path');
 
 const chooseFTS = document.getElementById('choose-folder-to-sort');
 
@@ -54,6 +55,7 @@ chooseFTS.addEventListener('click', (e) => {
 
     if (folderPath !== undefined) {
         document.getElementById('folder-to-sort').value = folderPath;
+        saveAppState();
     } else {
         console.log('Denied');
     }
@@ -78,8 +80,13 @@ function addSortFolder() {
 }
 
 function saveAppState() {
-    var t = fs.readFileSync(__dirname + "/appSavedState.json");
+    var t = fs.readFileSync(path.join(__dirname, "appSavedState.json"));
     var savedState = JSON.parse(t);
+
+    //Если установлена новая папка, ставим флаг на очистку истории
+    if (savedState.folderToSort != document.getElementById('folder-to-sort').value) {
+        savedState.clearHistoryOnLoad = true;
+    }
 
     savedState.folderToSort = document.getElementById('folder-to-sort').value;
 
@@ -96,7 +103,7 @@ function saveAppState() {
         savedState.sortToFolders.folders[i] = folder;
     }
 
-    fs.writeFileSync(__dirname + "/appSavedState.json", JSON.stringify(savedState));
+    fs.writeFileSync(path.join(__dirname, "appSavedState.json"), JSON.stringify(savedState));
 }
 
 

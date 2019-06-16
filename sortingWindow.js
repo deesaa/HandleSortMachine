@@ -36,27 +36,26 @@ ipcRenderer.on('pressedkey', (e, arg) => {
     //Нажатиями перемещаем файлы в нужные папки
     if (currentImage) {
         var key = arg.key;
-        var path;
+        var destinationPath;
         //Ищем нужный путь по ключу
         var folder = folders.find((folder, index) => {
             return folder.key === key;
         });
 
         if (folder) {
-            path = folder.path;
+            destinationPath = folder.path;
         } else {
             console.log("Папка не найдена");
         }
 
-        if (path) {
-
+        if (destinationPath) {
             //Перемещаем текущую картинку в папку по найденному пути
-            fs.renameSync(currentImage, path + "/" + targetFiles[0]);
+            fs.renameSync(currentImage, path.join(destinationPath, targetFiles[0]));
 
             //Запись в историю 
             var fileName = targetFiles[0];
             var origin = sortingFolder;
-            var destination = path;
+            var destination = destinationPath;
             var liItem = document.createElement('li');
             liItem.innerHTML = `<span class="file-name">${fileName}</span> moved from <span class="origin">${origin}</span> to <span class="destination">${destination}</span>`;
             addToHistoryList(liItem);
@@ -92,7 +91,7 @@ function loadNextImage() {
 }
 
 function loadSavedState() {
-    var t = fs.readFileSync(__dirname + "/appSavedState.json");
+    var t = fs.readFileSync(path.join(__dirname, "appSavedState.json"));
     var savedState = JSON.parse(t);
     folders = savedState.sortToFolders.folders;
     sortingFolder = savedState.folderToSort;
@@ -100,9 +99,9 @@ function loadSavedState() {
     var li = document.getElementById('sort-window-map').getElementsByTagName('ul')[0];
     for (var i = 1; i <= savedState.sortToFolders.count; i++) {
         var key = folders[i - 1].key;
-        var path = folders[i - 1].path;
+        var destinationPath = folders[i - 1].path;
         var newLiItem = document.createElement("li");
-        newLiItem.innerText = "Press " + key + ": move to folder " + path;
+        newLiItem.innerText = "Press " + key + ": move to folder " + destinationPath;
         li.appendChild(newLiItem);
     }
 
@@ -116,10 +115,19 @@ function loadSavedState() {
 
         addToHistoryList(liItem);
     })
+
+    //Если установлен флаг на очистку истории, очищаем и убираем флаг
+    if (savedState.clearHistoryOnLoad) {
+        clearHistory();
+        savedState.clearHistoryOnLoad = false;
+    }
+
+    fs.writeFileSync(path.join(__dirname, "appSavedState.json"), JSON.stringify(savedState));
 }
 
 function saveHistoy() {
-    var t = fs.readFileSync(__dirname + "/appSavedState.json");
+    var pathToSavedState = path.join(__dirname, "appSavedState.json");
+    var t = fs.readFileSync(pathToSavedState);
     var savedState = JSON.parse(t);
 
     var newHistory = [];
@@ -138,7 +146,7 @@ function saveHistoy() {
 
     console.log(savedState);
 
-    fs.writeFileSync(__dirname + "/appSavedState.json", JSON.stringify(savedState));
+    fs.writeFileSync(pathToSavedState, JSON.stringify(savedState));
 }
 
 function addToHistoryList(item) {
@@ -175,5 +183,7 @@ function cancelLastMove() {
 
         //Загружаем картинку
         loadNextImage();
+
+        //TODO: Если сменилась папка сортировки, то очищаем историю при загрузке
     }
 }
