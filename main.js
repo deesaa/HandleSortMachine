@@ -1,5 +1,7 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
 let mainWindow;
 
@@ -24,9 +26,24 @@ function createWindow() {
     app.quit();
   });
 
+  buildMenu();
   const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   Menu.setApplicationMenu(mainMenu);
+}
 
+function buildMenu() {
+
+  var keysList = JSON.parse(fs.readFileSync(path.join(__dirname, "sortKeysList.json")));
+
+  keysList.forEach((key) => {
+    mainMenuTemplate[1].submenu.push({
+      label: '',
+      accelerator: key.sortKey,
+      click() {
+        mainWindow.webContents.send('pressedkey', { key: key.sortKey });
+      }
+    })
+  })
 }
 
 app.on('ready', createWindow);
@@ -55,34 +72,6 @@ const mainMenuTemplate = [
   {
     label: '',
     submenu: [
-      {
-        label: '',
-        accelerator: "Left",
-        click() {
-          mainWindow.webContents.send('pressedkey', { key: 'Left' });
-        }
-      },
-      {
-        label: '',
-        accelerator: "Right",
-        click() {
-          mainWindow.webContents.send('pressedkey', { key: 'Right' });
-        }
-      },
-      {
-        label: '',
-        accelerator: "Up",
-        click() {
-          mainWindow.webContents.send('pressedkey', { key: 'Up' });
-        }
-      },
-      {
-        label: '',
-        accelerator: "Down",
-        click() {
-          mainWindow.webContents.send('pressedkey', { key: 'Down' });
-        }
-      },
       {
         label: '',
         accelerator: "Enter",

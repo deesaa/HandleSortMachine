@@ -69,15 +69,27 @@ ipcRenderer.on("app-closing", () => {
 function addSortFolder() {
     var list = document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].getElementsByTagName('li');
     var folderIndex = list.length + 1;
+    var folderPath = "new";
+
     //TODO: Новые ключи беруться из доступных
-    var path = "new";
-    var key = "new";
+    var keysList = [];
+    keysList = fs.readFileSync(path.join(__dirname, "sortKeysList.json"));
+    keysList = JSON.parse(keysList);
+    keyItemIndex = keysList.findIndex((value) => {
+        return value.taken === false;
+    })
 
-    var li = ec.createFolderLineListElement(folderIndex, path, key);
+    //Если есть свободный ключ, добавляем папку
+    if (keyItemIndex !== -1) {
+        var key = keysList[keyItemIndex].sortKey;
+        var li = ec.createFolderLineListElement(folderIndex, folderPath, key);
+        document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].appendChild(li);
+        addEventListenersTo(folderIndex);
 
-    document.getElementById("sort-to-folder").getElementsByTagName('ul')[0].appendChild(li);
+        keysList[keyItemIndex].taken = true;
 
-    addEventListenersTo(folderIndex);
+        fs.writeFileSync(path.join(__dirname, "sortKeysList.json"), JSON.stringify(keysList));
+    }
 }
 
 function saveAppState() {
@@ -140,8 +152,21 @@ function addEventListenersTo(index) {
     function deleteFolder() {
         var elIndex = index;
         return function () {
+            //Делаем ключ доступным в списке ключей (taken = false)
+            keysList = fs.readFileSync(path.join(__dirname, "sortKeysList.json"));
+            keysList = JSON.parse(keysList);
             var listItem = document.getElementById("list-item-" + elIndex);
+            var key = document.getElementById("key-" + elIndex).value;
+
+            var keyIndex = keysList.findIndex((value) => {
+                return value.sortKey == key;
+            })
+            keysList[keyIndex].taken = false;
+
+            //Удаляем папку с ключем
             listItem.remove();
+
+            fs.writeFileSync(path.join(__dirname, "sortKeysList.json"), JSON.stringify(keysList));
         }
     }
     df.addEventListener('click', deleteFolder());
