@@ -8,9 +8,11 @@ var folders = [];
 var sortingFolder;
 var targetFiles;
 var currentImage = null;
+const imageFilesEx = [".jpg", ".png", ".gif"];
+const videoFilesEx = [".webm", ".mp4"];
 loadSavedState();
 loadTargetFiles();
-loadNextImage();
+loadNextFile();
 
 let clearHistoryBtn = document.getElementById("clear-history");
 let saveHistoryBtn = document.getElementById("save-history");
@@ -48,7 +50,7 @@ ipcRenderer.on('pressedkey', (e, arg) => {
             console.log("Папка не найдена");
         }
 
-        if (destinationPath) {
+        if (destinationPath && currentImage && targetFiles[0]) {
             //Перемещаем текущую картинку в папку по найденному пути
             fs.renameSync(currentImage, path.join(destinationPath, targetFiles[0]));
 
@@ -63,7 +65,7 @@ ipcRenderer.on('pressedkey', (e, arg) => {
             //Убираем перемещенный файл из текущих
             targetFiles.shift();
             //Загружаем следующий файл
-            loadNextImage();
+            loadNextFile();
         } else {
             console.log("Путь не найден");
         }
@@ -72,21 +74,45 @@ ipcRenderer.on('pressedkey', (e, arg) => {
 
 function loadTargetFiles() {
 
-    //TODO: Добавить все остальные расширения
-    var extension = '.jpg';
+    //TODO: Добавить все остальные расширения (.webm)
+    var extensions = imageFilesEx.concat(videoFilesEx);
     var files = fs.readdirSync(sortingFolder);
     targetFiles = files.filter((file) => {
-        return path.extname(file).toLowerCase() === extension;
+        return extensions.some((i) => {
+            return i === path.extname(file).toLowerCase();
+        })
     });
 }
 
-function loadNextImage() {
+function loadNextFile() {
     if (targetFiles.length != 0) {
         currentImage = sortingFolder + "/" + targetFiles[0];
-        document.getElementById("image-for-sort").setAttribute("src", currentImage);
+
+        //Картинка или видео
+        if (imageFilesEx.some((item) => {
+            return item === path.extname(targetFiles[0]).toLowerCase();
+        })) {
+            //Картинка
+            document.getElementById("image-for-sort").setAttribute("src", currentImage);
+            document.getElementById("image-for-sort").style = "display: block";
+            document.getElementById("video-for-sort").setAttribute("src", " ");
+            document.getElementById("video-for-sort").hidden = true;
+            document.getElementById("no-files").style = "display: none";
+        } else {
+            //Видео
+            document.getElementById("video-for-sort").setAttribute("src", currentImage);
+            document.getElementById("video-for-sort").hidden = false;
+            document.getElementById("image-for-sort").setAttribute("src", " ");
+            document.getElementById("image-for-sort").style = "display: none";
+            document.getElementById("no-files").style = "display: none";
+        }
     } else {
         console.log("Нет подходящих файлов в папке");
-
+        document.getElementById("image-for-sort").setAttribute("src", " ");
+        document.getElementById("video-for-sort").setAttribute("src", " ");
+        document.getElementById("image-for-sort").style = "display: none";
+        document.getElementById("video-for-sort").hidden = true;
+        document.getElementById("no-files").style = "display: block";
     }
 }
 
@@ -182,7 +208,7 @@ function cancelLastMove() {
         targetFiles.unshift(fileName);
 
         //Загружаем картинку
-        loadNextImage();
+        loadNextFile();
 
         //TODO: Если сменилась папка сортировки, то очищаем историю при загрузке
     }
