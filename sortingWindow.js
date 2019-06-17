@@ -8,7 +8,7 @@ var folders = [];
 var sortingFolder;
 var targetFiles;
 var currentImage = null;
-const imageFilesEx = [".jpg", ".png", ".gif"];
+const imageFilesEx = [".jpg", ".png", ".gif", ".jpeg", ".jpg_large"];
 const videoFilesEx = [".webm", ".mp4"];
 loadSavedState();
 loadTargetFiles();
