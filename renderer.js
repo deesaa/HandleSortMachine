@@ -217,8 +217,28 @@ ipcRenderer.on('pressedkey', (e, arg) => {
         return;
     }
 
-    if (editingKey !== null && arg.key != null)
+    //Если редактируется ключ папки
+    if (editingKey !== null && arg.key != null) {
+        var previousKey = editingKey.value;
+        var newKey = arg.key;
         editingKey.value = arg.key;
+
+        //Изменяем лист доступных ключей
+        keysList = fs.readFileSync(path.join(__dirname, "sortKeysList.json"));
+        keysList = JSON.parse(keysList);
+
+        var key1 = keysList.findIndex((value) => {
+            return value.sortKey == previousKey;
+        })
+        keysList[key1].taken = false;
+
+        var key2 = keysList.findIndex((value) => {
+            return value.sortKey == newKey;
+        })
+        keysList[key2].taken = true;
+
+        fs.writeFileSync(path.join(__dirname, "sortKeysList.json"), JSON.stringify(keysList));
+    }
 })
 
 
