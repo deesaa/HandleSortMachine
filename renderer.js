@@ -18,6 +18,7 @@ let saveButton = document.getElementById('save-button');
 let addFolderButton = document.getElementById('add-sort-to-folder');
 let startSortButton = document.getElementById('start-sort-button');
 
+
 setAllEventListners();
 
 saveButton.addEventListener('click', (e) => {

@@ -17,6 +17,7 @@ loadNextFile();
 let clearHistoryBtn = document.getElementById("clear-history");
 let saveHistoryBtn = document.getElementById("save-history");
 let cancelMoveBtn = document.getElementById("cancel-move");
+let hideHistoryButton = document.getElementById('hide-history');
 
 saveHistoryBtn.addEventListener('click', () => {
     saveHistoy();
@@ -32,6 +33,10 @@ clearHistoryBtn.addEventListener('click', () => {
 
 cancelMoveBtn.addEventListener('click', () => {
     cancelLastMove();
+})
+
+hideHistoryButton.addEventListener('click', () => {
+    hideHistory();
 })
 
 ipcRenderer.on('pressedkey', (e, arg) => {
@@ -127,7 +132,7 @@ function loadSavedState() {
         var key = folders[i - 1].key;
         var destinationPath = folders[i - 1].path;
         var newLiItem = document.createElement("li");
-        newLiItem.innerText = "Press " + key + ": move to folder " + destinationPath;
+        newLiItem.innerHTML = `Press <span class="key">${key}</span>: move to folder <span class="destination">${destinationPath}</span>`
         li.appendChild(newLiItem);
     }
 
@@ -188,6 +193,16 @@ function clearHistory() {
     var historyList = document.getElementById('history-list');
     while (historyList.lastChild) {
         historyList.removeChild(historyList.lastChild);
+    }
+}
+
+function hideHistory() {
+    var hide = hideHistoryButton.checked;
+
+    if (hide) {
+        document.getElementById('history-list-block').style.display = "none";
+    } else {
+        document.getElementById('history-list-block').style.display = "block";
     }
 }
 

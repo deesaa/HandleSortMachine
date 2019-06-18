@@ -15,11 +15,25 @@ input[id ^= "sort-to-folder"]{
 
 aside{
     float: left;
+    width: 33%;
 }
 
-.file-name, .origin, .destination{
+.history-list-block{
+    
+}
+
+.sort-window-map{
     font-size: 12px;
-    color: red;
+}
+
+.file-name, .origin{
+    font-size: 12px;
+    color: green;
+}
+
+.destination, .key{
+    color: firebrick;
+    font-size: 16px;
 }
 
 .no-files{
