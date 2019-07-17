@@ -79,6 +79,13 @@ const mainMenuTemplate = [
           mainWindow.webContents.send('pressed:enter');
         }
       },
+      {
+        label: '',
+        accelerator: "Escape",
+        click() {
+          mainWindow.webContents.send('pressed:esc');
+        }
+      }
     ]
   }
 ];

@@ -248,3 +248,9 @@ ipcRenderer.on('pressed:enter', () => {
         editingKeyWin.close();
     }
 })
+
+ipcRenderer.on('pressed:esc', () => {
+    if (sortingWindow) {
+        sortingWindow.webContents.send('pressed:esc');
+    }
+})
