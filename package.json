@@ -1,20 +1,20 @@
 {
-  "name": "electron-quick-start",
+  "name": "handle-sort-machine",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Picture sorting application",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/deesaa/HandleSortMachine",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "Sorting",
+    "Pictures",
+    "Images",
+    "Demo"
   ],
-  "author": "GitHub",
+  "author": "Dmitry DeeSaa",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^5.0.2"
