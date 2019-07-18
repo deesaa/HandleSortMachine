@@ -18,6 +18,12 @@ aside{
     width: 33%;
 }
 
+.myname{
+    margin-left: 12px;
+    display: inline-block;
+    color: grey;
+}
+
 .history-list-block{
     
 }

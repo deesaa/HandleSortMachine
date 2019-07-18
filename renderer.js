@@ -36,7 +36,8 @@ startSortButton.addEventListener('click', () => {
         sortingWindow = new BrowserWindow({
             webPreferences: {
                 nodeIntegration: true
-            }
+            },
+            title: "Sorting Window"
         })
         sortingWindow.loadFile('sortingWindow.html');
         sortingWindow.maximize();

@@ -4,12 +4,14 @@ const fs = require('fs');
 const path = require('path');
 
 let mainWindow;
+let aboutWindow;
 
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    title: "Handle Sort Machine",
     webPreferences: {
       nodeIntegration: true
     }
@@ -87,26 +89,44 @@ const mainMenuTemplate = [
         }
       }
     ]
+  },
+  {
+    label: "About",
+    click() {
+      if (!aboutWindow) {
+        aboutWindow = new BrowserWindow({
+          width: 300,
+          height: 300,
+          title: "About",
+          autoHideMenuBar: true,
+        });
+
+        aboutWindow.on('closed', () => { aboutWindow = null });
+
+        aboutWindow.loadFile('about.html');
+
+      }
+    }
   }
 ];
 
-if (process.env.NODE_ENV !== 'prod') {
-  mainMenuTemplate.push({
-    label: 'Developer Tools',
-    submenu: [
-      {
-        label: 'Toggle Devtools',
-        click(item, focusedWindow) {
-          focusedWindow.toggleDevTools();
-        },
-      },
-      {
-        label: 'Restart',
-        click(item, focusedWindow) {
-          focusedWindow.reload();
-        }
-      }
-    ]
-  });
-}
+// if (process.env.NODE_ENV !== 'prod') {
+//   mainMenuTemplate.push({
+//     label: 'Developer Tools',
+//     submenu: [
+//       {
+//         label: 'Toggle Devtools',
+//         click(item, focusedWindow) {
+//           focusedWindow.toggleDevTools();
+//         },
+//       },
+//       {
+//         label: 'Restart',
+//         click(item, focusedWindow) {
+//           focusedWindow.reload();
+//         }
+//       }
+//     ]
+//   });
+// }
 
