@@ -1,6 +1,6 @@
 # Hadle Sort Machine
 
-**Clone and run for a quick way to see Hadle Sort Machine in action.**
+**Sort your images from heap folder to other folders by pressing keys**
 
 ## To Use
 
